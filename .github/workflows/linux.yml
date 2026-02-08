@@ -3,9 +3,13 @@ name: SDRangel Linux release build
 on:
   push:
     branches:
+      - master
       - linux_github_release
+      - fix-*
+      - feature-*
     tags:
       - 'v*'
+  pull_request:
 
 jobs:
   build_deb:
@@ -46,10 +50,10 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-            if [[ "${{github.ref_name}}" == "linux_github_release" ]]; then
-                echo "version=$(echo ${{github.sha}} | cut -c1-7)" >> $GITHUB_OUTPUT
-            else
+            if [[ "${{github.ref}}" == refs/tags/* ]]; then
                 echo "version=$(echo ${{github.ref_name}} | cut -c2-)" >> $GITHUB_OUTPUT
+            else
+                echo "version=$(echo ${{github.sha}} | cut -c1-7)" >> $GITHUB_OUTPUT
             fi
       - name: Rename
         run: mv ../sdrangel_*_amd64.deb sdrangel_${{ steps.get_version.outputs.version }}_${{ matrix.os }}_amd64.deb
